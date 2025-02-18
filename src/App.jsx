@@ -4,8 +4,14 @@ import { Task } from './components/Task'
 import { Form } from './components/Form'
 function App() {
   const [actividad, setActividad] = useState('');
-  const [actividades, setActividades] = useState([]);
+  const [actividades, setActividades] = useState(()=>{
+    return JSON.parse(localStorage.getItem("actividades")) || []});
 
+    useEffect(()=>{
+      localStorage.setItem("actividades", JSON.stringify(actividades));
+    }, [actividades]);
+/*He decidido agregar la función de que se guarde en el local storage, así al recargar la página evitamos que las actividades 
+cargadas se pierdan */
   useEffect(() =>{
     document.title = `Actividades pendientes: ${actividades.length}`;
   }, [actividades])
