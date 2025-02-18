@@ -1,0 +1,44 @@
+
+#hacer:hover{
+    background-color: rgb(78, 125, 49);
+    transition: all 500ms ease-in-out;
+    cursor: pointer;
+
+}
+#borrar:hover{
+    background-color: rgb(248, 100, 135);
+    cursor: pointer;
+
+}
+#borrar{
+    transition: all 500ms ease-in-out;
+
+}
+.hecha{
+    text-decoration: line-through;
+}
+.noHecha{
+    text-decoration: none;
+}
+.containerActividad{
+    border: black solid 1px;
+    padding: 5px;
+    border-radius: 10px;
+    margin: 10px;
+    box-shadow: 3px 3px 10px rgba(45, 80, 80, 0.5);
+    transition: all 1s ease-in-out;
+    background-image: linear-gradient(to left, #6eadaf, #b370d2);
+
+}
+.containerActividadHecha{
+    transition: all 1s ease-in-out;
+    background-image: linear-gradient(to left, #6e7daf, #d270a9);
+}
+.containerActividad, .containerActividadHecha{
+    transition: background-image 1s ease-in-out, transform 0.3s ease-in-out
+}
+.containerActividad:hover{
+    transform: scale(1.05);
+    box-shadow: 5px 5px 20px rgba(45, 80, 80, 0.6); 
+    transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
+}   
