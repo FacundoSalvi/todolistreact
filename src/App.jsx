@@ -1,45 +1,63 @@
-import { useEffect, useState } from 'react'
-import './App.css'
-import { Task } from './components/Task'
-import { Form } from './components/Form'
+import { useEffect, useState } from 'react';
+import './App.css';
+import { Task } from './components/Task';
+import { Form } from './components/Form';
+import { supabase } from '../supabase';
+
 function App() {
   const [actividad, setActividad] = useState('');
-  const [actividades, setActividades] = useState(()=>{
-    return JSON.parse(localStorage.getItem("actividades")) || []});
+  const [actividades, setActividades] = useState([]);
 
     useEffect(()=>{
-      localStorage.setItem("actividades", JSON.stringify(actividades));
-    }, [actividades]);
-/*He decidido agregar la función de que se guarde en el local storage, así al recargar la página evitamos que las actividades 
-cargadas se pierdan */
-  useEffect(() =>{
+      const fetchActividades = async () => {
+        const { data, error } = await supabase.from("activity").select("*");
+        if (error){
+          console.error("Error al obtener actividades:", error);
+        } else{
+          setActividades(data);
+        }
+      };
+      fetchActividades();
+  }, []);
+  
+  useEffect(()=>{
     document.title = `Actividades pendientes: ${actividades.length}`;
-  }, [actividades])
+  }, [actividades]);
 
   const handleChange = e =>{
     setActividad(e.target.value)
   }
 
-  const addTask = e =>{
+  const addTask = async (e) =>{
     e.preventDefault();
     if(actividad.trim() ===''){
       alert('Debes ingresar una actividad')
       return;
     }
-    const nuevaActividad ={
-      id: Date.now(),
-      actividad, /*Es lo mismo que poner "actividad: actividad", al poner unicamente "actividad" el programa da por entendido que la key y el value son lo mismo  */
-      terminada: false
+
+    const {data, error} = await supabase
+    .from("activity")
+    .insert([{actividad, terminada: false}])
+    .select();
+
+    if(error){
+      console.error("Error al agregar actividad: ", error);
+      return;
+    } else{
+      console.log("Actividades obtenidas: ", data)
+      setActividades(data)
     }
-    const actividadesTotales = [nuevaActividad, ...actividades]
-    setActividades(actividadesTotales);
-    setActividad('')
-  }
-  const borrarActividad = id =>{
-      const actividadesActualizadas = actividades.filter(actividad =>{
-        return actividad.id !== id
-      })
-      setActividades(actividadesActualizadas);
+    setActividades([...actividades, data[0]]);
+    setActividad("");
+  };
+
+  const borrarActividad = async (id) =>{
+    const {error} = await supabase.from("activity").delete().eq("id", id);
+    if (error){
+      console.error("Error al borrar actividad: ", error);
+      return;
+    }
+    setActividades(actividades.filter((actividad) => actividad.id !== id));
   }
 
 
@@ -51,9 +69,9 @@ cargadas se pierdan */
       addTask = {addTask}
       actividad = {actividad}
     />
-    {actividades.length > 1 && (
+    {actividades.length > 1 && 
       <button onClick={()=>setActividades([])}>Vaciar actividades</button>
-    )}
+    }
     {actividades.map(actividad=>(
       <Task
       key={actividad.id}
